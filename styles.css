@@ -255,3 +255,23 @@ button, .btn, .topLink{
   height: auto;
   max-width: 56px;  /* 好みで 52〜60 */
 }
+
+html, body{
+  overflow-x: hidden;
+}
+
+/* 100vw由来のはみ出しを回避 */
+*{
+  box-sizing: border-box;
+}
+
+img{
+  max-width: 100%;
+  height: auto;
+}
+
+/* 画面幅に収める */
+#app, .screen{
+  width: 100%;
+  max-width: 100%;
+}
