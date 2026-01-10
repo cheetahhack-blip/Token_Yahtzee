@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>刀剣ヨット</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar hidden" id="topbar">
+    <div class="left"></div>
+    <div class="right" id="topNav"></div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- タイトル：タイトル/サブタイトル/はじめる だけ -->
+    <section id="screenTitle" class="panel screen active">
+      <h1 class="h1">刀剣ヨット</h1>
+      <p class="muted">刀剣男子とヨットしてみた</p>
+      <div class="controls">
+        <button id="goModeBtn" class="btn primary">はじめる</button>
+      </div>
+    </section>
+
+    <!-- モード選択：余計なもの無し -->
+    <section id="screenMode" class="panel screen">
+      <h2>モード選択</h2>
+      <div class="cats">
+        <div class="cat mode" data-mode="easy">
+            <div class="name">易（水心子正秀）</div><div class="score">堅実</div>
+            </div>
+            <div class="cat mode" data-mode="normal">
+            <div class="name">普（監査官）</div><div class="score">合理</div>
+            </div>
+            <div class="cat mode" data-mode="hard">
+            <div class="name">難（後家兼光）</div><div class="score">攻め</div>
+            </div>
+            <div class="cat mode" data-mode="expert">
+            <div class="name">超難（山姥切長義）</div><div class="score">選別</div>
+            </div>
+
+            <!-- 隠し：完全非表示→解放で表示 -->
+            <div class="cat mode" data-mode="secret" id="secretModeCard" style="display:none;">
+            <div class="name">乱（山姥切長義 極）</div><div class="score">極</div>
+      </div>
+
+      <div class="controls">
+        <button id="backTitleBtn" class="btn">戻る</button>
+      </div>
+    </section>
+
+    <!-- 対戦 -->
+    <section id="screenBattle" class="screen battleGrid">
+      <section class="panel">
+        <div id="roundBig" class="roundBig"></div>
+        <div id="turnArea"></div>
+
+        <div id="playerControls" class="controls">
+          <button id="rollBtn" class="btn primary">ロール</button>
+        </div>
+        <div class="hint" id="hint"></div>
+
+        <div id="cpuControls" class="controls" style="display:none;">
+          <button id="nextRoundBtn" class="btn primary">次のラウンドへ</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>役（未使用のみ）</h2>
+        <div id="cats" class="cats"></div>
+      </section>
+
+      <section class="panel">
+        <h2>スコアカード</h2>
+        <div id="scorecard" class="scorecard"></div>
+      </section>
+    </section>
+
+    <!-- 役説明 -->
+    <section id="screenRules" class="panel screen">
+      <h2>役説明</h2>
+      <div id="rulesBody"></div>
+      <div class="controls">
+        <button id="backBtnFromRules" class="btn">戻る</button>
+      </div>
+    </section>
+
+    <!-- 実績 -->
+    <section id="screenAch" class="panel screen">
+      <h2>実績</h2>
+      <div id="achBody"></div>
+      <div class="controls">
+        <button id="backBtnFromAch" class="btn">戻る</button>
+      </div>
+    </section>
+
+    <!-- リザルト -->
+    <section id="screenResult" class="panel screen">
+      <h2>リザルト</h2>
+      <div id="resultBody"></div>
+      <div class="controls">
+        <button id="retryBtn" class="btn primary">同じモードでもう一戦</button>
+        <button id="toTitleBtn" class="btn">タイトルへ</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
