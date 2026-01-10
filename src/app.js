@@ -555,7 +555,7 @@ async function showResult() {
       <div class="name">${verdict}</div>
       <div class="desc">自 ${pTotal} 点 / 敵 ${cTotal} 点</div>
       <div class="note">上段ボーナス：自 +${upperBonus(pScore)} / 敵 +${upperBonus(cScore)}</div>
-      <div class="note" style="margin-top:8px; color:#222;">${finLine}</div>
+      <div class="note" style="margin-top:8px;">${finLine}</div>
     </div>
   `;
 
