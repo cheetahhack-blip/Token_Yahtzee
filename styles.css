@@ -275,3 +275,39 @@ img{
   width: 100%;
   max-width: 100%;
 }
+
+html, body{
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;   /* hiddenより安全に効く環境がある */
+}
+
+@supports not (overflow-x: clip) {
+  html, body { overflow-x: hidden; }
+}
+
+/* 100vwがあると“スクロールバー分”はみ出すことがある */
+*[style*="100vw"], .w100vw {
+  width: 100% !important;
+}
+
+/* 念のため */
+img, svg, canvas{
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Force battle layout to stack (PC too) --- */
+#battleMain, .battleMain, .battleLayout, .battleGrid, .mainGrid, .gameMain{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* gridで2カラムにしている場合を潰す */
+#battleMain, .battleMain, .battleLayout, .battleGrid, .mainGrid, .gameMain{
+  grid-template-columns: 1fr !important;
+}
+
