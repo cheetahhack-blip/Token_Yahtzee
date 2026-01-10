@@ -255,11 +255,3 @@ button, .btn, .topLink{
   height: auto;
   max-width: 56px;  /* 好みで 52〜60 */
 }
-
-@media (max-width: 480px){
-  .diceRow .die,
-  .diceExample .die{
-    width: auto !important;
-    height: auto !important;
-  }
-}
