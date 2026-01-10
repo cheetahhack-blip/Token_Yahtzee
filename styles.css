@@ -230,3 +230,28 @@ button, .btn, .topLink{
     font-size: 18px;
   }
 }
+
+/* --- Keep 5 dice in one row on small screens --- */
+.diceRow,
+.diceExample{
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+/* diceRow/Example内の各ダイスが縮むのを許可 */
+.diceRow .die,
+.diceExample .die{
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* 画像も枠に収まるように */
+.diceRow .dieImg,
+.diceExample .dieImg{
+  width: 100%;
+  height: auto;
+  max-width: 56px;  /* 好みで 52〜60 */
+}
