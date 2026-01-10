@@ -1,183 +1,329 @@
-:root { --bg:#0f1115; --fg:#e8e8ea; --muted:#a9acb2; --card:#171a21; --line:#2a2f3a; }
-* { box-sizing: border-box; }
-body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--bg); color:var(--fg); }
-.topbar { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(15,17,21,.95); backdrop-filter: blur(8px); }
-.title { font-weight:700; }
-.meta { color:var(--muted); font-size: 14px; }
-
-.wrap { max-width: 980px; margin: 0 auto; padding: 16px; display:grid; gap: 16px; grid-template-columns: 1fr; }
-@media (min-width: 960px){ .wrap { grid-template-columns: 1fr 1fr; } .panel:last-child { grid-column: 1 / -1; } }
-
-.panel { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; }
-h2 { margin: 0 0 10px; font-size: 16px; color: var(--muted); font-weight: 600; }
-
-.diceRow { display:flex; gap:10px; flex-wrap: wrap; }
-.die {
-  width:64px; height:64px; display:grid; place-items:center;
-  border-radius: 14px; border: 1px solid var(--line);
-  background: #10131a; cursor: pointer;
-  font-size: 22px; font-weight: 800;
-  user-select:none;
-}
-.die.held { outline: 2px solid #ffffff33; background:#121827; }
-.die .sub { font-size: 11px; color: var(--muted); font-weight: 600; margin-top:2px; }
-
-.controls { margin-top: 12px; display:flex; gap: 10px; flex-wrap:wrap; }
-.btn { padding: 10px 12px; border-radius: 12px; border:1px solid var(--line); background:#10131a; color:var(--fg); cursor:pointer; }
-.btn.primary { background:#1b2233; }
-.btn:disabled { opacity: .5; cursor:not-allowed; }
-
-.hint { margin-top: 10px; color: var(--muted); font-size: 13px; }
-
-.cats { display:grid; gap: 8px; }
-.cat {
-  display:flex; justify-content:space-between; align-items:center;
-  padding: 10px 12px; border:1px solid var(--line); border-radius: 12px;
-  background:#10131a; cursor:pointer;
-}
-.cat:hover { background:#121827; }
-.cat .name { font-weight: 700; }
-.cat .score { color: var(--muted); }
-
-.scorecard { display:grid; gap: 8px; }
-.row { display:flex; justify-content:space-between; padding: 8px 10px; border-bottom:1px dashed #2a2f3a; }
-.row:last-child { border-bottom:none; }
-.row .k { color: var(--muted); }
-.row .v { font-weight: 700; }
-
-.screen { }
-.hidden { display:none; }
-
-.h1 { margin: 0 0 8px; font-size: 24px; }
-.muted { color: var(--muted); margin: 8px 0 0; }
-
-.battleGrid{
-  display:grid;
-  gap:16px;
-  grid-template-columns: 1fr;
-}
-@media (min-width: 960px){
-  .battleGrid{ grid-template-columns: 1fr 1fr; }
-  .battleGrid > .panel:last-child { grid-column: 1 / -1; }
+:root{
+  --bg:#0f1115;
+  --fg:#e8e8ea;
+  --muted:#a9acb2;
+  --card:#171a21;
+  --line:#2a2f3a;
 }
 
-.banner{
-  margin: 6px 0 10px;
-  padding: 8px 10px;
+/* =========================
+   Base
+========================= */
+*{ box-sizing:border-box; }
+html, body{
+  width:100%;
+  max-width:100%;
+  margin:0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background:var(--bg);
+  color:var(--fg);
+}
+
+/* セーフエリア（iPhone等） */
+body{
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* 画像ははみ出さない */
+img, svg, canvas{
+  max-width:100%;
+  height:auto;
+}
+
+/* 画面全体がギリギリで欠けるのを防ぐ */
+#app, .screen{
+  width:100%;
+  max-width:100%;
+  padding-left:8px;
+  padding-right:8px;
+}
+
+/* =========================
+   Topbar
+========================= */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 16px;
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  background:rgba(15,17,21,.95);
+  backdrop-filter: blur(8px);
+}
+.topbar.hidden{ display:none !important; }
+.topbar .right{ display:flex; gap:10px; align-items:center; }
+
+.title{ font-weight:700; }
+.meta{ color:var(--muted); font-size:14px; }
+
+.topLink{
+  padding:8px 10px;
   border:1px solid var(--line);
-  border-radius: 12px;
+  border-radius:12px;
   background:#10131a;
-  color: var(--muted);
-  font-size: 13px;
+  color:var(--fg);
+  cursor:pointer;
+  font-size:13px;
 }
+.topLink:hover{ background:#121827; }
 
-.legend{
-  margin-top: 10px;
-  padding: 10px 12px;
-  border:1px solid var(--line);
-  border-radius: 12px;
-  background:#10131a;
-}
-.legendTitle{ color: var(--muted); font-size: 12px; margin-bottom: 6px; }
-.legendBody{ font-size: 13px; line-height: 1.5; }
+/* =========================
+   Screen control
+========================= */
+.screen{ display:none !important; }
+.screen.active{ display:block !important; }
 
-/* topbar nav */
-.topbar { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(15,17,21,.95); backdrop-filter: blur(8px); }
-.topbar .right { display:flex; gap:10px; align-items:center; }
-.topLink { padding:8px 10px; border:1px solid var(--line); border-radius: 12px; background:#10131a; color:var(--fg); cursor:pointer; font-size: 13px; }
-.topLink:hover { background:#121827; }
-
-.roundBig{
-  font-size: 22px;
-  font-weight: 900;
-  padding: 10px 12px;
-  border:1px solid var(--line);
-  border-radius: 14px;
-  background:#10131a;
-  margin-bottom: 10px;
-}
-
-.turnBox{
-  border:1px solid var(--line);
-  border-radius: 14px;
-  background:#10131a;
-  padding: 12px;
-}
-.turnTitle{ color: var(--muted); font-size: 13px; margin-bottom: 10px; }
-.turnLine{ color: var(--muted); font-size: 13px; margin-top: 10px; }
-
-.rulesGrid{ display:grid; gap:10px; margin-top: 10px; }
-.ruleItem{ padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:#10131a; }
-.ruleItem .name{ font-weight: 800; }
-.ruleItem .desc{ color: var(--muted); font-size: 13px; margin-top: 4px; }
-.ruleItem .note{ color: var(--muted); font-size: 12px; margin-top: 6px; }
-
-/* 画面制御：screenはデフォルト非表示、activeだけ表示 */
-.screen { display: none !important; }
-.screen.active { display: block !important; }
-
-/* battleのときだけ grid になる */
+/* battle画面は“常に縦積み”にする（PCもスマホ同様） */
 .screen.battleGrid.active{
   display:grid !important;
   gap:16px;
   grid-template-columns: 1fr;
 }
-@media (min-width: 960px){
-  .screen.battleGrid.active{ grid-template-columns: 1fr 1fr; }
-  .screen.battleGrid.active > .panel:last-child { grid-column: 1 / -1; }
+
+/* =========================
+   Layout & panels
+========================= */
+.wrap{
+  max-width:980px;
+  margin:0 auto;
+  padding:16px;
+  display:grid;
+  gap:16px;
+  grid-template-columns:1fr;
 }
 
-/* ヘッダーは必要な時だけ表示 */
-.topbar.hidden { display:none !important; }
-
-.die img.dieImg{
-  width: 52px;
-  height: 52px;
-  image-rendering: auto;
-  user-select: none;
-  pointer-events: none;
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
 }
 
-/* 押した感じ + HOLD強調 */
+h2{
+  margin:0 0 10px;
+  font-size:16px;
+  color:var(--muted);
+  font-weight:600;
+}
+
+.h1{ margin:0 0 8px; font-size:24px; }
+.muted{ color:var(--muted); margin:8px 0 0; }
+.hidden{ display:none; }
+
+.banner{
+  margin:6px 0 10px;
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#10131a;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* =========================
+   Buttons / Controls / Hint
+========================= */
+.controls{
+  margin-top:12px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#10131a;
+  color:var(--fg);
+  cursor:pointer;
+}
+.btn.primary{ background:#1b2233; }
+.btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+.hint{ margin-top:10px; color:var(--muted); font-size:13px; }
+
+/* タップ領域（PC/スマホ共通で少し大きめ） */
+button, .btn, .topLink{
+  min-height:44px;
+  padding:10px 14px;
+  font-size:16px;
+}
+
+/* =========================
+   Dice
+========================= */
+.diceRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap; /* デスクトップは自然に折り返してOK */
+}
+
 .die{
-  position: relative;
+  width:68px;
+  height:68px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#10131a;
+  cursor:pointer;
+
+  font-size:22px;
+  font-weight:800;
+  user-select:none;
+
+  position:relative;
   transition: transform 0.06s ease, box-shadow 0.06s ease, filter 0.06s ease;
   box-shadow: 0 6px 0 rgba(0,0,0,0.20);
 }
 
-/* 押下で沈む */
 .die:active{
   transform: translateY(3px);
   box-shadow: 0 3px 0 rgba(0,0,0,0.18);
   filter: brightness(0.98);
 }
 
-/* HOLDは枠を濃く＋ピン表示 */
+.die .sub{
+  font-size:11px;
+  color:var(--muted);
+  font-weight:600;
+  margin-top:2px;
+}
+
+.die img.dieImg{
+  width:56px;
+  height:56px;
+  image-rendering:auto;
+  user-select:none;
+  pointer-events:none;
+}
+
+/* HOLD */
 .die.held{
-  outline: 3px solid rgba(0,0,0,0.85);
-  outline-offset: 2px;
+  outline:3px solid rgba(0,0,0,0.85);
+  outline-offset:2px;
+  background:#121827;
 }
-
 .die.held::after{
-  content: "📌";
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 22px;
-  height: 22px;
-  display: grid;
-  place-items: center;
-  background: #fff;
-  border: 2px solid #000;
-  border-radius: 999px;
-  font-size: 13px;
+  content:"📌";
+  position:absolute;
+  top:-6px;
+  right:-6px;
+  width:22px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  background:#fff;
+  border:2px solid #000;
+  border-radius:999px;
+  font-size:13px;
 }
 
+/* =========================
+   Categories (unused roles)
+========================= */
+.cats{
+  display:grid;
+  gap:8px;
+}
+
+.cat{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  min-height:56px;
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#10131a;
+  cursor:pointer;
+}
+.cat:hover{ background:#121827; }
+.cat .name{ font-weight:700; }
+.cat .score{ color:var(--muted); }
+
+.cat.weak{ opacity:0.55; }
+
+.cat.best{
+  transform: translateY(-1px);
+  box-shadow: 0 8px 0 rgba(0,0,0,0.22);
+}
+
+/* =========================
+   Scorecard
+========================= */
+.scorecard{
+  display:grid;
+  gap:8px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  padding:8px 10px;
+  border-bottom:1px dashed #2a2f3a;
+}
+.row:last-child{ border-bottom:none; }
+.row .k{ color:var(--muted); }
+.row .v{ font-weight:700; }
+
+/* =========================
+   Turn box
+========================= */
+.roundBig{
+  font-size:22px;
+  font-weight:900;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#10131a;
+  margin-bottom:10px;
+}
+
+.turnBox{
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#10131a;
+  padding:12px;
+}
+.turnTitle{ color:var(--muted); font-size:13px; margin-bottom:10px; }
+.turnLine{ color:var(--muted); font-size:13px; margin-top:10px; }
+
+/* =========================
+   Rules / Legend
+========================= */
+.rulesGrid{ display:grid; gap:10px; margin-top:10px; }
+
+.ruleItem{
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#10131a;
+}
+.ruleItem .name{ font-weight:800; }
+.ruleItem .desc{ color:var(--muted); font-size:13px; margin-top:4px; }
+.ruleItem .note{ color:var(--muted); font-size:12px; margin-top:6px; }
+
+.legend{
+  margin-top:10px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#10131a;
+}
+.legendTitle{ color:var(--muted); font-size:12px; margin-bottom:6px; }
+.legendBody{ font-size:13px; line-height:1.5; }
+
+/* 役説明のダイス例 */
 .diceExample{
   display:flex;
   gap:6px;
   margin-top:8px;
-  flex-wrap:wrap;
+  flex-wrap:wrap; /* デスクトップは折り返してOK */
 }
 .die.ex{
   box-shadow:none;
@@ -188,126 +334,28 @@ h2 { margin: 0 0 10px; font-size: 16px; color: var(--muted); font-weight: 600; }
   height:34px;
 }
 
-.cat.weak {
-  opacity: 0.55;
-}
-
-.cat.best{
-  transform: translateY(-1px);
-  box-shadow: 0 8px 0 rgba(0,0,0,0.22);
-}
-
-/* --- Mobile tap targets --- */
-button, .btn, .topLink{
-  min-height: 44px;
-  padding: 10px 14px;
-  font-size: 16px;
-}
-
-.cat{
-  min-height: 56px;
-  padding: 12px 14px;
-}
-
-.die{
-  width: 68px;   /* 既に固定なら好みで */
-  height: 68px;
-}
-
-.dieImg{
-  width: 56px;
-  height: 56px;
-}
-
+/* =========================
+   Mobile tuning
+========================= */
 @media (max-width: 480px){
-  .catsGrid, #cats{
-    gap: 10px;
+  /* ダイスは横1列固定。画面内に収めるため縮むのを許可 */
+  .diceRow, .diceExample{
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
   }
-  .diceRow{
-    gap: 10px;
+  .diceRow .die, .diceExample .die{
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
   }
-  .turnTitle{
-    font-size: 18px;
+  .diceRow .dieImg, .diceExample .dieImg{
+    width: 100%;
+    max-width: 56px;
+    height: auto;
   }
-}
 
-/* --- Keep 5 dice in one row on small screens --- */
-.diceRow,
-.diceExample{
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
+  .turnTitle{ font-size:18px; }
+  #cats{ gap:10px; }
 }
-
-/* diceRow/Example内の各ダイスが縮むのを許可 */
-.diceRow .die,
-.diceExample .die{
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-/* 画像も枠に収まるように */
-.diceRow .dieImg,
-.diceExample .dieImg{
-  width: 100%;
-  height: auto;
-  max-width: 56px;  /* 好みで 52〜60 */
-}
-
-html, body{
-  overflow-x: hidden;
-}
-
-/* 100vw由来のはみ出しを回避 */
-*{
-  box-sizing: border-box;
-}
-
-img{
-  max-width: 100%;
-  height: auto;
-}
-
-/* 画面幅に収める */
-#app, .screen{
-  width: 100%;
-  max-width: 100%;
-}
-
-html, body{
-  width: 100%;
-  max-width: 100%;
-  overflow-x: clip;   /* hiddenより安全に効く環境がある */
-}
-
-@supports not (overflow-x: clip) {
-  html, body { overflow-x: hidden; }
-}
-
-/* 100vwがあると“スクロールバー分”はみ出すことがある */
-*[style*="100vw"], .w100vw {
-  width: 100% !important;
-}
-
-/* 念のため */
-img, svg, canvas{
-  max-width: 100%;
-  height: auto;
-}
-
-/* --- Force battle layout to stack (PC too) --- */
-#battleMain, .battleMain, .battleLayout, .battleGrid, .mainGrid, .gameMain{
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 12px;
-  width: 100%;
-  max-width: 100%;
-}
-
-/* gridで2カラムにしている場合を潰す */
-#battleMain, .battleMain, .battleLayout, .battleGrid, .mainGrid, .gameMain{
-  grid-template-columns: 1fr !important;
-}
-
