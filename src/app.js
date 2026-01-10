@@ -74,14 +74,24 @@ function markShownSecretToast(){
   localStorage.setItem(SECRET_TOAST_KEY, "1");
 }
 
-function show(screenId) {
-  for (const id of SCREENS) {
-    const el = $(id);
-    if (!el) continue;
-    el.classList.toggle("active", id === screenId);
+function show(screenId){
+  const screens = document.querySelectorAll(".screen");
+  screens.forEach(s => {
+    const isOn = (s.id === screenId);
+    s.classList.toggle("active", isOn);
+
+    // CSS依存をやめて、inlineで強制的に1枚だけ表示
+    s.style.display = isOn ? "" : "none";
+  });
+
+  // 画面ごとのヘッダー表示制御（あなたの仕様どおり）
+  const tb = document.querySelector(".topbar");
+  if (tb){
+    const hideTop = (screenId === "screenTitle" || screenId === "screenMode");
+    tb.classList.toggle("hidden", hideTop);
   }
-  renderTopbar(screenId);
 }
+
 
 function navBtn(text, onClick) {
   const b = document.createElement("button");
