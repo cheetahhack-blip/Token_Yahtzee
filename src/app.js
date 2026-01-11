@@ -1,10 +1,52 @@
 // PWA: Service Worker register
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js", { scope: "./" })
-      .catch(() => {});
+async function promptSwUpdate(reg) {
+  if (!reg?.waiting) return;
+
+  const ok = await modalConfirm({
+    title: "更新",
+    message: "新しいバージョンがあります。再読み込みしますか？",
+    okText: "再読み込み",
+    cancelText: "あとで"
+  });
+  if (!ok) return;
+
+  reg.waiting.postMessage({ type: "SKIP_WAITING" });
+
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloaded) return;
+    reloaded = true;
+    location.reload();
   });
 }
+
+async function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+
+  try {
+    const reg = await navigator.serviceWorker.register("./service-worker.js", { scope: "./" });
+
+    // すでに待機中ならすぐ聞く
+    if (reg.waiting) promptSwUpdate(reg);
+
+    reg.addEventListener("updatefound", () => {
+      const nw = reg.installing;
+      if (!nw) return;
+
+      nw.addEventListener("statechange", () => {
+        // 既存SWがある状態で新SWが入った＝更新
+        if (nw.state === "installed" && navigator.serviceWorker.controller) {
+          promptSwUpdate(reg);
+        }
+      });
+    });
+
+    // ときどき更新チェック（放置でも更新に気づける）
+    setInterval(() => reg.update(), 6 * 60 * 60 * 1000); // 6時間ごと
+  } catch (_) {}
+}
+
+window.addEventListener("load", registerServiceWorker);
 
 // src/app.js
 import {
@@ -197,6 +239,98 @@ const cpuTitle = (m) => {
 };
 
 let modalResolver = null;
+
+// PWA install prompt
+let deferredInstallPrompt = null;
+const INSTALL_DISMISSED_KEY = "pwa_install_dismissed_v1";
+
+function isIos() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+function isStandalone() {
+  return window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator.standalone === true;
+}
+
+function hideInstallBtn() {
+  const b = $("installBtn");
+  if (!b) return;
+  b.classList.add("hidden");
+}
+
+function setupInstallButton() {
+  const btn = $("installBtn");
+  if (!btn) return;
+
+  // すでにインストール済み or もう表示しない
+  if (isStandalone() || localStorage.getItem(INSTALL_DISMISSED_KEY) === "1") {
+    hideInstallBtn();
+    return;
+  }
+
+  // iOSは beforeinstallprompt がないので、手順モーダルを出す
+  if (isIos()) {
+    btn.textContent = "アプリとして追加";
+    btn.classList.remove("hidden");
+    btn.onclick = async () => {
+      const v = await openModal({
+        title: "ホーム画面に追加",
+        message: "iPhone/iPadは自動インストールができません。\nSafariの共有ボタン →「ホーム画面に追加」を選んでください。",
+        actions: [
+          { label: "もう表示しない", value: "dismiss", primary: false },
+          { label: "閉じる", value: "close", primary: true }
+        ]
+      });
+      if (v === "dismiss") localStorage.setItem(INSTALL_DISMISSED_KEY, "1");
+    };
+    return;
+  }
+
+  // Android/PC（Chrome等）は beforeinstallprompt で有効化
+  const refreshBtnState = () => {
+    if (isStandalone() || localStorage.getItem(INSTALL_DISMISSED_KEY) === "1") {
+      hideInstallBtn();
+      return;
+    }
+    if (!deferredInstallPrompt) {
+      hideInstallBtn();
+      return;
+    }
+    btn.textContent = "アプリをインストール";
+    btn.classList.remove("hidden");
+    btn.onclick = async () => {
+      try {
+        // 1回押したら一旦隠す（連打防止）
+        hideInstallBtn();
+
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+
+        if (choice?.outcome !== "accepted") {
+          // 初回だけにしたいので、拒否したら今後は出さない
+          localStorage.setItem(INSTALL_DISMISSED_KEY, "1");
+        }
+      } catch (_) {
+        // 失敗したら今後表示しない（初心者向けに安定化）
+        localStorage.setItem(INSTALL_DISMISSED_KEY, "1");
+      }
+    };
+  };
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    refreshBtnState();
+  });
+
+  window.addEventListener("appinstalled", () => {
+    localStorage.setItem(INSTALL_DISMISSED_KEY, "1");
+    hideInstallBtn();
+  });
+
+  // 起動時にも状態反映（イベントが遅れてくる場合がある）
+  refreshBtnState();
+}
 
 function closeModal(result){
   const ov = $("modalOverlay");
@@ -790,4 +924,5 @@ $("toTitleBtn")?.addEventListener("click", () => {
 });
 
 // start
+setupInstallButton();
 show("screenTitle");
