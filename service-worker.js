@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v1"; // 変更したら v2, v3... に上げる
+const CACHE_VERSION = "v2"; // 変更したら v2, v3... に上げる
 const CACHE_NAME = `token-yahtzee-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
