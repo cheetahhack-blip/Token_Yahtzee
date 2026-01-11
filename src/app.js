@@ -249,16 +249,25 @@ function resetMatch() {
 }
 
 async function resignToTitle() {
-  // 仕様：降参は記録しない（勝敗も実績も）
+  // 1段目：確認（セリフは出さない）
   const ok = await modalConfirm({
     title: cpuTitle(mode),
-    message: `${line(mode, "resign")}\n\n降参しますか？`
+    message: "降参する？"
   });
   if (!ok) return;
 
+  // 2段目：確定後コメント（刀剣男子の台詞）
+  await openModal({
+    title: cpuTitle(mode),
+    message: line(mode, "resign"),
+    actions: [{ label: "タイトルへ戻る", value: true, primary: true }]
+  });
+
+  // 仕様：降参は記録しない（勝敗も実績も）
   resetMatch();
   show("screenTitle");
 }
+
 
 function renderRound() {
   $("roundBig").textContent = `ラウンド ${round} / 12`;
@@ -719,7 +728,7 @@ function renderAch() {
   $("clearAchBtn").addEventListener("click", async () => {
     const ok = await modalConfirm({
       title: modeLabel(mode),
-      message: "このモードの実績と保存データを削除しますか？\n（乱モードの解放状況は維持されます）"
+      message: "このモードの実績と保存データを削除しますか？"
     });
     if (!ok) return;
 
