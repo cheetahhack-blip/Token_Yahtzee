@@ -183,6 +183,62 @@ function updateModeCards() {
 // ----------------------
 // Basic helpers
 // ----------------------
+const cpuTitle = (m) => {
+  const n = cpuName(m);
+  return n.endsWith(" 極") ? n.replace(" 極", "（極）") : n;
+};
+
+let modalResolver = null;
+
+function closeModal(result){
+  const ov = $("modalOverlay");
+  ov.classList.add("hidden");
+  ov.setAttribute("aria-hidden","true");
+  $("modalActions").innerHTML = "";
+  if (modalResolver) modalResolver(result);
+  modalResolver = null;
+}
+
+function openModal({ title, message, actions }){
+  const ov = $("modalOverlay");
+  $("modalTitle").textContent = title ?? "";
+  $("modalBody").textContent = message ?? "";
+
+  const area = $("modalActions");
+  area.innerHTML = "";
+  actions.forEach(a=>{
+    const b = document.createElement("button");
+    b.className = `btn ${a.primary ? "primary" : ""}`.trim();
+    b.textContent = a.label;
+    b.addEventListener("click", ()=> closeModal(a.value));
+    area.appendChild(b);
+  });
+
+  ov.classList.remove("hidden");
+  ov.setAttribute("aria-hidden","false");
+
+  area.querySelector("button")?.focus();
+  return new Promise(resolve => { modalResolver = resolve; });
+}
+
+document.addEventListener("keydown", (e)=>{
+  if (e.key !== "Escape") return;
+  const ov = $("modalOverlay");
+  if (!ov || ov.classList.contains("hidden")) return;
+  closeModal(false);
+});
+
+async function modalConfirm({ title, message, okText="はい", cancelText="いいえ" }){
+  const v = await openModal({
+    title, message,
+    actions: [
+      { label: cancelText, value:false, primary:false },
+      { label: okText, value:true, primary:true },
+    ]
+  });
+  return !!v;
+}
+
 function resetMatch() {
   round = 1;
   pScore = newScorecard();
@@ -192,9 +248,14 @@ function resetMatch() {
   lastCpu = null;
 }
 
-function resignToTitle() {
+async function resignToTitle() {
   // 仕様：降参は記録しない（勝敗も実績も）
-  alert(line(mode, "resign"));
+  const ok = await modalConfirm({
+    title: cpuTitle(mode),
+    message: `${line(mode, "resign")}\n\n降参しますか？`
+  });
+  if (!ok) return;
+
   resetMatch();
   show("screenTitle");
 }
@@ -651,19 +712,21 @@ function renderAch() {
       <div class="name">削除</div>
       <div class="controls" style="margin-top:10px;">
         <button class="btn" id="clearAchBtn">このモードの実績を削除</button>
-        <button class="btn" id="clearAllBtn">このモードの保存データを全削除</button>
       </div>
     </div>
   `;
 
-  $("clearAchBtn").addEventListener("click", () => {
-    storageClearMode(mode, { achievementsOnly: true });
+  $("clearAchBtn").addEventListener("click", async () => {
+    const ok = await modalConfirm({
+      title: modeLabel(mode),
+      message: "このモードの実績と保存データを削除しますか？\n（乱モードの解放状況は維持されます）"
+    });
+    if (!ok) return;
+
+    storageClearMode(mode);
     renderAch();
   });
-  $("clearAllBtn").addEventListener("click", () => {
-    storageClearMode(mode, { achievementsOnly: false });
-    renderAch();
-  });
+
 }
 
 // ----------------------

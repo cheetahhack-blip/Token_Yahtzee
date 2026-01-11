@@ -44,13 +44,8 @@ export function saveModeData(mode, data){
 }
 
 /** 仕様どおり：モード別削除（実績のみ / 全部） */
-export function storageClearMode(mode, { achievementsOnly } = { achievementsOnly: false }){
-  if (achievementsOnly){
-    const d = getModeData(mode);
-    d.unlocked = {};
-    saveModeData(mode, d);
-    return;
-  }
+/** モード別：実績＋通算（wins_vs 等の全体フラグは残す） */
+export function storageClearMode(mode){
   localStorage.removeItem(km(mode, "data"));
 }
 
