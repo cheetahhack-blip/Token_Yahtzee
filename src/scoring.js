@@ -31,17 +31,17 @@ export const CAT_LABEL = Object.freeze({
 // UI固定並び：理論上の最大点（上限）順（同上限は任意順）
 export const CAT_ORDER = [
   CATS.YAHTZEE,
-  CATS.LARGE_STRAIGHT,
-  CATS.CHOICE,
   CATS.FOUR_KIND,
-  CATS.FULL_HOUSE,
-  CATS.SIX,
-  CATS.FIVE,
-  CATS.FOUR,
-  CATS.THREE,
-  CATS.TWO,
-  CATS.A,
+  CATS.LARGE_STRAIGHT,
   CATS.SMALL_STRAIGHT,
+  CATS.FULL_HOUSE,
+  CATS.CHOICE,
+  CATS.A,
+  CATS.TWO,
+  CATS.THREE,
+  CATS.FOUR,
+  CATS.FIVE,
+  CATS.SIX,
 ];
 
 export function sum(dice){ return dice.reduce((a,b)=>a+b,0); }
@@ -87,7 +87,7 @@ export function scoreCategory(dice, cat){
     case CATS.FULL_HOUSE: {
       const vals = [...c.values()].sort((a,b)=>a-b);
       const isFH = (vals.length === 2 && vals[0] === 2 && vals[1] === 3);
-      return isFH ? total : 0; // ← 5個合計
+      return isFH ? 25 : 0; // ← 25点固定
     }
 
     case CATS.SMALL_STRAIGHT:
@@ -134,7 +134,7 @@ export const CAT_DESC = Object.freeze({
   [CATS.SIX]: "6の目の合計点。",
   [CATS.CHOICE]: "出目5個の合計点。",
   [CATS.FOUR_KIND]: "同じ目が4個以上。成立すると合計点。",
-  [CATS.FULL_HOUSE]: "同じ目3個＋別の目2個。成立すると合計点。",
+  [CATS.FULL_HOUSE]: "同じ目3個＋別の目2個。25点固定。",
   [CATS.SMALL_STRAIGHT]: "連番4個（1234 / 2345 / 3456）。15点固定。",
   [CATS.LARGE_STRAIGHT]: "連番5個（12345 / 23456）。30点固定。",
   [CATS.YAHTZEE]: "同じ目が5個。50点固定。",

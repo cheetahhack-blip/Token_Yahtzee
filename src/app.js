@@ -51,18 +51,18 @@ const cpuName = (m) => CPU_NAME[m] ?? "相手";
 
 // 役の強さ優先度（同点時の並び用：大きいほど上）
 const CAT_PRIORITY = {
-  YAHTZEE: 100,
-  LARGE_STRAIGHT: 90,
-  SMALL_STRAIGHT: 80,
-  FULL_HOUSE: 70,
-  FOUR_KIND: 60,
-  CHOICE: 50,
-  SIX: 46,
-  FIVE: 45,
-  FOUR: 44,
-  THREE: 43,
-  TWO: 42,
-  A: 41,
+  YAHTZEE: 120,
+  FOUR_KIND: 110,
+  LARGE_STRAIGHT: 100,
+  SMALL_STRAIGHT: 90,
+  FULL_HOUSE: 80,
+  CHOICE: 70,
+  A: 6,
+  TWO: 5,
+  THREE: 4,
+  FOUR: 3,
+  FIVE: 2,
+  SIX: 1,
 };
 
 const SECRET_TOAST_KEY = "ty_secret_unlocked_toast_shown";
@@ -165,6 +165,8 @@ let turn = newTurnState();
 // "player" | "cpu"
 let phase = "player";
 let lastCpu = null;
+
+let lastPlayer = null; // { catName, pts }
 
 // 役説明/実績から戻る先
 let returnFromInfo = "screenBattle";
@@ -300,6 +302,7 @@ function renderCats() {
       if (!ok) return;
 
       pScore = commitCategory(pScore, turn.dice, cat);
+      lastPlayer = { catName: CAT_LABEL[cat], pts };
       doCpuTurn();
     });
 
@@ -373,11 +376,20 @@ function renderTurnArea() {
     if (pts >= 30 && !key) key = "big";
 
     const msg = document.createElement("div");
-    msg.className = "turnLine";
-    msg.textContent = key
+    const msg1 = document.createElement("div");
+    msg1.className = "turnLine";
+    // 直前のあなたの確定役へのリアクション
+    if (lastPlayer) {
+      msg1.textContent = line(mode, "react", { round, cat: lastPlayer.catName, pts: lastPlayer.pts });
+      box.appendChild(msg1);
+    }
+
+    const msg2 = document.createElement("div");
+    msg2.className = "turnLine";
+    msg2.textContent = key
     ? line(mode, "event", { key, round, cat: catName, pts })
     : line(mode, "cpu",   { round, cat: catName, pts });
-    box.appendChild(msg);
+    box.appendChild(msg2);
 
     playerControls.style.display = "none";
     cpuControls.style.display = "";
@@ -568,8 +580,8 @@ async function showResult() {
 
   // リザルト表示
   const finLine =
-    verdict === "勝利" ? line(mode, "win") :
-    verdict === "敗北" ? line(mode, "lose") :
+    verdict === "勝利" ? line(mode, "lose") :
+    verdict === "敗北" ? line(mode, "win") :
     line(mode, "draw");
 
   $("resultBody").innerHTML = `
