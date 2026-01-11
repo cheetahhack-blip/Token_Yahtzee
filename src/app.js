@@ -90,6 +90,8 @@ function show(screenId){
     const hideTop = (screenId === "screenTitle" || screenId === "screenMode");
     tb.classList.toggle("hidden", hideTop);
   }
+  // ヘッダーの中身（役説明/実績/降参など）も画面遷移ごとに更新
+  renderTopbar(screenId);
 }
 
 
@@ -203,6 +205,22 @@ function renderScorecard() {
   const sc = $("scorecard");
   sc.innerHTML = "";
 
+  const pUpper = upperSum(pScore), pBonus = upperBonus(pScore), pTotal = totalScore(pScore);
+  const cUpper = upperSum(cScore), cBonus = upperBonus(cScore), cTotal = totalScore(cScore);
+
+  // 仕様：合計点をスコアカードの一番上にも表示
+  const top = document.createElement("div");
+  top.className = "row totalTop";
+  top.innerHTML = `
+    <div class="k">合計（現在）</div>
+    <div class="v">
+      <span class="t ${pBonus > 0 ? "bonus" : ""}">自 ${pTotal}</span>
+      ｜
+      <span class="t ${cBonus > 0 ? "bonus" : ""}">${cpuName(mode)} ${cTotal}</span>
+    </div>
+  `;
+  sc.appendChild(top);
+
   for (const cat of CAT_ORDER) {
     const pv = pScore[cat];
     const cv = cScore[cat];
@@ -212,21 +230,25 @@ function renderScorecard() {
       <div class="k">${CAT_LABEL[cat]}</div>
       <div class="v">自 ${pv === null ? "—" : pv} / ${cpuName(mode)} ${cv === null ? "—" : cv}</div>
     `;
-
     sc.appendChild(r);
   }
-
-  const pUpper = upperSum(pScore), pBonus = upperBonus(pScore), pTotal = totalScore(pScore);
-  const cUpper = upperSum(cScore), cBonus = upperBonus(cScore), cTotal = totalScore(cScore);
 
   const hr = document.createElement("div");
   hr.className = "row";
   hr.innerHTML = `<div class="k">上段合計 / ボーナス</div><div class="v">自 ${pUpper}/${pBonus}｜${cpuName(mode)} ${cUpper}/${cBonus}</div>`;
   sc.appendChild(hr);
 
+  // ボーナスが付いた側だけ色を強調（合計の文字色が変わる）
   const tr = document.createElement("div");
   tr.className = "row";
-  tr.innerHTML = `<div class="k">合計</div><div class="v">自 ${pTotal}｜${cpuName(mode)} ${cTotal}</div>`;
+  tr.innerHTML = `
+    <div class="k">合計</div>
+    <div class="v">
+      <span class="t ${pBonus > 0 ? "bonus" : ""}">自 ${pTotal}</span>
+      ｜
+      <span class="t ${cBonus > 0 ? "bonus" : ""}">${cpuName(mode)} ${cTotal}</span>
+    </div>
+  `;
   sc.appendChild(tr);
 }
 

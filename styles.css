@@ -47,6 +47,8 @@ img, svg, canvas{
   justify-content:space-between;
   align-items:center;
   padding:12px 16px;
+    /* iPhone等のノッチ/セーフエリア対策 */
+  padding-top: calc(12px + env(safe-area-inset-top));
   border-bottom:1px solid var(--line);
   position:sticky;
   top:0;
@@ -271,6 +273,17 @@ button, .btn, .topLink{
 .row .k{ color:var(--muted); }
 .row .v{ font-weight:700; }
 
+/* 合計（上部表示） */
+.row.totalTop{
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#10131a;
+  margin-bottom:6px;
+}
+.row .t.bonus{
+  color:#ffd66b;
+}
+
 /* =========================
    Turn box
 ========================= */
@@ -338,6 +351,12 @@ button, .btn, .topLink{
    Mobile tuning
 ========================= */
 @media (max-width: 480px){
+  /* ヘッダーボタンが画面外に溢れないようにする */
+  .topbar{ padding:10px 10px; }
+  .topbar .left{ display:none; }
+  .topbar .right{ flex-wrap:wrap; justify-content:flex-end; gap:8px; }
+  .topLink{ min-height:40px; padding:8px 10px; font-size:14px; }
+
   /* ダイスは横1列固定。画面内に収めるため縮むのを許可 */
   .diceRow, .diceExample{
     flex-wrap: nowrap;
